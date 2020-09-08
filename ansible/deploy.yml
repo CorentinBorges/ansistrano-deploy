@@ -1,7 +1,17 @@
 ---
 - hosts: aws
+
+  vars_prompt:
+    - name: git_branch
+      prompt: 'Enter a branch to deploy'
+      default: master
+      private: no
+
   vars:
     ansistrano_deploy_to: "/var/www/project"
-
+    ansistrano_deploy_via: git
+    ansistrano_git_repo: git@github.com:CorentinBorges/snowtrick_ansible.git
+    ansistrano_git_identity_key_path: "{{ playbook_dir }}/id_rsa"
+    ansistrano_git_branch: "{{ git_branch }}"
   roles:
     - ansistrano.deploy
