@@ -30,7 +30,7 @@
 - name: Setup directory  permission for var/
   become: true
   file:
-    path: '{{ release_logs_path }}'
+    path: '{{ release_var_path }}'
     state: directory
     mode: 0777
     recurse: true
