@@ -12,7 +12,7 @@
 - name: Cache clear
   command: "{{ release_console_path }} cache:clear --no-warmup --env=prod"
 
-- name: Warm upo the cache
+- name: Warm up the cache
   command: "{{ release_console_path }} cache:warmup --env=prod"
 
 - name: Create DB if not exist
