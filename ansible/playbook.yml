@@ -75,6 +75,7 @@
         - php7.4-intl
         - php7.4-mysql
         - php7.4-xml
+        - php-apcu
       notify: Restart PHP-FPM
 
     - name: Create mysql user
