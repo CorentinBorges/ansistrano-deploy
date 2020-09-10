@@ -1,0 +1,45 @@
+---
+- name: Stup infrastructured-related parameters
+  template:
+    src: "{{ playbook_dir }}/templates/parameters.yml"
+    dest: '{{ ansistrano_release_path.stdout }}/app/config/parameters.yml'
+
+- name: Install composer
+  composer:
+    command: install
+    working_dir: '{{ ansistrano_release_path.stdout }}'
+
+- name: Cache clear
+  command: "{{ release_console_path }} cache:clear --no-warmup --env=prod"
+
+- name: Warm upo the cache
+  command: "{{ release_console_path }} cache:warmup --env=prod"
+
+- name: Create DB if not exist
+  become: true
+  command: "{{ release_console_path }} doctrine:database:create --if-not-exists --env=prod "
+  register: create_db_output
+  changed_when: create_db_output.stdout is not search('already exists. Skipped.')
+
+- name: Run migrations
+  become: true
+  command: "{{ release_console_path }} doctrine:migration:migrate --no-interaction --env=prod "
+  register: run_migrations_output
+  changed_when: run_migrations_output.stdout is not search('no migration to execute')
+
+- name: Setup directory  permission for var/
+  become: true
+  file:
+    path: '{{ release_logs_path }}'
+    state: directory
+    mode: 0777
+    recurse: true
+
+- name: Install bundle assets
+  command: '{{ release_console_path }} assets:install --symlink --env=prod'
+
+- name: Install Node dependencies
+  command: yarn install
+  args:
+    chdir: '{{ ansistrano_release_path.stdout }}'
+

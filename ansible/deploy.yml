@@ -1,6 +1,11 @@
 ---
 - hosts: aws
 
+  vars_files:
+    - ./vars/deploy_vault.yml
+    - ./vars/vars.yml
+    - ./vars/deploy_vars.yml
+
   vars_prompt:
     - name: git_branch
       prompt: 'Enter a branch to deploy'
@@ -8,10 +13,22 @@
       private: no
 
   vars:
+    release_console_path: "{{ ansistrano_release_path.stdout }}/bin/console"
+    release_var_path: "{{ ansistrano_release_path.stdout }}/var"
+    release_logs_path: "{{ ansistrano_shared_path }}/var/logs"
     ansistrano_deploy_to: "/var/www/project"
+    ansistrano_keep_releases: 3
+    ansistrano_shared_paths:
+      - var/logs
+      - node_modules
     ansistrano_deploy_via: git
-    ansistrano_git_repo: git@github.com:CorentinBorges/snowtrick_ansible.git
+    ansistrano_git_repo: git@github.com:CorentinBorges/ansistrano-deploy.git
     ansistrano_git_identity_key_path: "{{ playbook_dir }}/id_rsa"
     ansistrano_git_branch: "{{ git_branch }}"
+    ansistrano_after_symlink_shared_tasks_file: "{{ playbook_dir }}/deploy/after-symlink-shared.yml"
+
+  environment:
+    SYMFONY_ENV: prod
+
   roles:
     - ansistrano.deploy
