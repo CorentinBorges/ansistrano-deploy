@@ -1,0 +1,8 @@
+---
+- name: Remove sensitive from web/ dir
+  file:
+    path: "{{ release_web_path }}"
+    state: absent
+    with_items:
+      - app_dev.php
+      - config.php
